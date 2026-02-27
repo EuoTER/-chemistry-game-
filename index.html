@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>Chemistry Quiz Game</title>
 
@@ -52,14 +53,12 @@ background:#1e40af;
 }
 
 body{
-
 margin:0;
 font-family:tahoma;
 background:url("lobby.jpeg");
 background-size:cover;
 color: aquamarine;
 text-align:center;
-
 }
 
 .screen{
@@ -69,20 +68,18 @@ display:none;
 }
 
 #menu{
-
-display:block;
-margin-top:200px;
-
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
 }
 
 .box{
-
-background:rgba(0,0,0,0.75);
-padding:30px;
-border-radius:20px;
-display:inline-block;
-min-width:300px;
-
+    background:rgba(0,0,0,0.75);
+    padding:30px;
+    border-radius:20px;
+    width:90%;
+    max-width:500px;
 }
 
 button{
