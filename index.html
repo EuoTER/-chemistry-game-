@@ -67,6 +67,13 @@ display:none;
 
 }
 
+.screen{
+  display:none;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+
 #menu{
     display:flex;
     justify-content:center;
@@ -639,29 +646,67 @@ opacity:1;
 
 }
 
+.matchGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+  margin-top:20px;
+}
+
+.card{
+  background:#222;
+  padding:20px;
+  border-radius:10px;
+  cursor:pointer;
+  color:white;
+  font-size:18px;
+}
+
+.card.flipped{
+  background:#06b6d4;
+}
+
+.card.matched{
+  background:green;
+}
+
 </style>
 </head>
 
 <body>
 
-
 <!-- MENU -->
 
-<div id="menu">
-
-<div class="box">
-
-<h1>🧪 CHEMISTRY QUIZ</h1>
-
-<button onclick="startGame()">เริ่มเกม</button>
-
-<button onclick="openSettings()">ตั้งค่า</button>
-
+<!-- MENU -->
+<div id="menu" class="screen">
+  <div class="box">
+    <h1>CHEMISTRY QUIZ</h1>
+    <button onclick="goToModeSelect()">เริ่มเกม</button>
+    <button onclick="openSettings()">ตั้งค่า</button>
+  </div>
 </div>
 
+<!-- เลือกโหมดเกม -->
+<div id="modeSelect" class="screen">
+  <div class="box">
+    <h2>เลือกโหมดเกม</h2>
+    <button onclick="startMatching()">เกมจับคู่สารเคมี</button>
+    <button onclick="startGuessing()">เกมทายชื่อสารเคมี</button>
+    <button onclick="startMining()">เกมขุดหาแร่</button>
+    <br><br>
+    <button onclick="goToMenu()">กลับ</button>
+  </div>
 </div>
 
-
+<!-- MATCHING GAME -->
+<div id="matchingGame" class="screen">
+  <div class="box">
+    <h2>เกมจับคู่สารเคมี</h2>
+    <div class="matchGrid" id="matchGrid"></div>
+    <br>
+    <button onclick="goToModeSelect()">กลับ</button>
+  </div>
+</div>
 
 <!-- SETTINGS -->
 
@@ -1437,6 +1482,105 @@ document.addEventListener("DOMContentLoaded", function(){
 
   </div>
 </div>
+
+<script>
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(screen=>{
+    screen.style.display = "none";
+  });
+  document.getElementById(id).style.display = "flex";
+}
+
+function goToModeSelect(){
+  showScreen("modeSelect");
+}
+
+function goToMenu(){
+  showScreen("menu");
+}
+
+function startMatching(){
+  showScreen("matchingGame");
+  initMatchingGame();
+}
+
+function startGuessing(){
+  alert("เข้าเกมทายชื่อสารเคมี");
+}
+
+function startMining(){
+  alert("เข้าเกมขุดหาแร่");
+}
+
+let firstCard=null;
+let lockBoard=false;
+
+function initMatchingGame(){
+
+  const pairs=[
+    "H₂O","H₂O",
+    "NaCl","NaCl",
+    "CO₂","CO₂"
+  ];
+
+  const shuffled=pairs.sort(()=>0.5-Math.random());
+  const grid=document.getElementById("matchGrid");
+  grid.innerHTML="";
+
+  shuffled.forEach(text=>{
+    const card=document.createElement("div");
+    card.classList.add("card");
+    card.dataset.value=text;
+    card.innerText="?";
+
+    card.onclick=()=>flipCard(card);
+
+    grid.appendChild(card);
+  });
+
+  firstCard=null;
+  lockBoard=false;
+}
+
+function flipCard(card){
+
+  if(lockBoard || card.classList.contains("flipped")) return;
+
+  card.classList.add("flipped");
+  card.innerText=card.dataset.value;
+
+  if(!firstCard){
+    firstCard=card;
+    return;
+  }
+
+  if(firstCard.dataset.value===card.dataset.value){
+
+    firstCard.classList.add("matched");
+    card.classList.add("matched");
+    firstCard=null;
+
+  }else{
+
+    lockBoard=true;
+
+    setTimeout(()=>{
+      firstCard.classList.remove("flipped");
+      card.classList.remove("flipped");
+      firstCard.innerText="?";
+      card.innerText="?";
+      firstCard=null;
+      lockBoard=false;
+    },800);
+
+  }
+
+}
+
+// เปิดหน้าแรกตอนโหลดเว็บ
+showScreen("menu");
+</script>
+
 
 </body>
 </html>
