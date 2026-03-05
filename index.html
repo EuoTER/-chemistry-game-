@@ -6,7 +6,6 @@
 <title>Chemistry Quiz Game</title>
 
 <style>
-
 .gameBox{
 
 width:700px;
@@ -648,18 +647,120 @@ opacity:1;
 
 .matchGrid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
+  grid-template-columns:repeat(8,1fr);
+  gap:10px;
   margin-top:20px;
 }
 
-.card{
-  background:#222;
-  padding:20px;
-  border-radius:10px;
-  cursor:pointer;
-  color:white;
-  font-size:18px;
+/* MINING MAP */
+
+.mineGrid{
+
+display:grid;
+grid-template-columns:repeat(10,50px);
+gap:5px;
+justify-content:center;
+margin:20px;
+
+}
+
+.mineBlock{
+
+width:50px;
+height:50px;
+
+background:#333;
+
+border-radius:6px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+cursor:pointer;
+
+transition:0.2s;
+
+}
+
+.mineBlock:hover{
+
+transform:scale(1.1);
+background:#555;
+
+}
+
+/* INVENTORY */
+
+.inventoryGrid{
+
+display:grid;
+grid-template-columns:repeat(5,60px);
+gap:10px;
+justify-content:center;
+
+}
+
+.invSlot{
+
+width:60px;
+height:60px;
+
+background:#111;
+
+border:2px solid cyan;
+
+border-radius:10px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:18px;
+
+}
+
+/* LAB BUBBLE */
+
+#bubbleArea{
+
+position:relative;
+
+height:120px;
+
+margin-top:20px;
+
+}
+
+.bubble{
+
+width:12px;
+height:12px;
+
+background:white;
+
+border-radius:50%;
+
+position:absolute;
+
+bottom:0;
+
+animation:bubbleUp 2s infinite;
+
+}
+
+@keyframes bubbleUp{
+
+0%{
+transform:translateY(0);
+opacity:1;
+}
+
+100%{
+transform:translateY(-100px);
+opacity:0;
+}
+
 }
 
 .card.flipped{
@@ -668,6 +769,73 @@ opacity:1;
 
 .card.matched{
   background:green;
+}
+
+.card{
+  background:#222;
+  aspect-ratio:1/1;
+  border-radius:12px;
+  cursor:pointer;
+  color:white;
+  font-size:18px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.labContainer{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+margin-top:20px;
+}
+
+.craftList{
+background:rgba(255,255,255,0.05);
+padding:15px;
+border-radius:10px;
+max-height:300px;
+overflow-y:auto;
+}
+
+.craftItem{
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+font-size:16px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.craftItem.can{
+background:rgba(0,255,100,0.15);
+border:1px solid #00ff88;
+}
+
+.craftItem.cant{
+background:rgba(255,0,0,0.15);
+border:1px solid #ff5555;
+}
+
+.craftBtn{
+padding:5px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.craftBtn:disabled{
+opacity:0.4;
+cursor:not-allowed;
+}
+
+#labInventory{
+margin-top:10px;
+background:rgba(255,255,255,0.05);
+padding:10px;
+border-radius:10px;
+font-size:14px;
 }
 
 </style>
@@ -680,7 +848,7 @@ opacity:1;
 <!-- MENU -->
 <div id="menu" class="screen">
   <div class="box">
-    <h1>CHEMISTRY QUIZ</h1>
+    <h1>CHEMISTRY GAME</h1>
     <button onclick="goToModeSelect()">เริ่มเกม</button>
     <button onclick="openSettings()">ตั้งค่า</button>
   </div>
@@ -690,22 +858,73 @@ opacity:1;
 <div id="modeSelect" class="screen">
   <div class="box">
     <h2>เลือกโหมดเกม</h2>
+
+    <button onclick="startQuiz()">เกมตอบคำถามเคมี</button>
     <button onclick="startMatching()">เกมจับคู่สารเคมี</button>
-    <button onclick="startGuessing()">เกมทายชื่อสารเคมี</button>
+
     <button onclick="startMining()">เกมขุดหาแร่</button>
+
     <br><br>
     <button onclick="goToMenu()">กลับ</button>
   </div>
 </div>
 
 <!-- MATCHING GAME -->
-<div id="matchingGame" class="screen">
+<div id="miningGame" class="screen">
   <div class="box">
-    <h2>เกมจับคู่สารเคมี</h2>
-    <div class="matchGrid" id="matchGrid"></div>
+
+    <h2>⛏️ เหมืองแร่เคมี</h2>
+
+    <div id="mineGrid" class="mineGrid"></div>
+
+    <h3>🎒 Inventory</h3>
+
+    <div id="inventory" class="inventoryGrid"></div>
+
     <br>
+
+    <button onclick="openLab()">🧪 เข้า Lab</button>
+
     <button onclick="goToModeSelect()">กลับ</button>
+
   </div>
+</div>
+
+<!-- LAB SCREEN -->
+<div id="labScreen" class="screen">
+
+<div class="box">
+
+<h2>🧪 Chemistry Craft Lab</h2>
+
+<div class="labContainer">
+
+<div class="craftList" id="craftList"></div>
+
+<div>
+
+<h3>📜 สูตรการคราฟ</h3>
+
+<div id="craftRecipe">
+เลือกสูตรเพื่อดูรายละเอียด
+</div>
+
+<h3>🎒 Inventory</h3>
+
+<div id="labInventory"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<br>
+
+<button onclick="goToMining()">← กลับเหมือง</button>
+
+</div>
+
 </div>
 
 <!-- SETTINGS -->
@@ -1499,6 +1718,392 @@ function goToMenu(){
   showScreen("menu");
 }
 
+/* ===================== */
+/* MINING SYSTEM */
+/* ===================== */
+
+let mineSize = 10
+let mineMap = []
+
+let inventory = {}
+let recipes=[
+
+{
+name:"⚙️ Steel",
+need:{
+"Iron":2,
+"Coal":1
+}
+},
+
+{
+name:"🔋 Battery",
+need:{
+"Copper":2,
+"Coal":1
+}
+},
+
+{
+name:"💎 Energy Crystal",
+need:{
+"Diamond":1,
+"Uranium":1
+}
+}
+
+]
+function hasItems(need){
+
+for(let item in need){
+
+if(!inventory[item] || inventory[item]<need[item]){
+
+return false
+
+}
+
+}
+
+return true
+
+}
+function renderCraft(){
+
+let html=""
+
+recipes.forEach((r,i)=>{
+
+let can=hasItems(r.need)
+
+html+=`
+<div class="craftItem ${can?'can':'cant'}">
+
+<div onclick="showRecipe(${i})">
+${r.name}
+</div>
+
+<button class="craftBtn"
+onclick="craftItem(${i})"
+${can?'':'disabled'}>
+Craft
+</button>
+
+</div>
+`
+
+})
+
+document.getElementById("craftList").innerHTML=html
+
+}
+function showRecipe(i){
+
+let r=recipes[i]
+
+let text=`<b>${r.name}</b><br><br>`
+
+for(let item in r.need){
+
+text+=`${item} x${r.need[item]}<br>`
+
+}
+
+document.getElementById("craftRecipe").innerHTML=text
+
+}
+function craftItem(i){
+
+let r=recipes[i]
+
+if(!hasItems(r.need)) return
+
+for(let item in r.need){
+
+inventory[item]-=r.need[item]
+
+}
+
+if(!inventory[r.name]) inventory[r.name]=0
+
+inventory[r.name]++
+
+renderInventory()
+renderLabInventory()
+renderCraft()
+
+}
+const minerals = [
+
+"🪨","🪨","🪨","🪨","🪨",
+
+"⚫ Coal",
+
+"🟤 Copper",
+
+"⚙️ Iron",
+
+"🥇 Gold",
+
+"💎 Diamond",
+
+"☢️ Uranium"
+
+]
+
+function randomMineral(){
+
+let r=Math.random()
+
+if(r<0.55) return "🪨"
+if(r<0.70) return "⚫ Coal"
+if(r<0.82) return "🟤 Copper"
+if(r<0.92) return "⚙️ Iron"
+if(r<0.97) return "🥇 Gold"
+if(r<0.995) return "💎 Diamond"
+
+return "☢️ Uranium"
+
+}
+
+function generateMine(){
+
+mineMap=[]
+
+for(let y=0;y<mineSize;y++){
+
+let row=[]
+
+for(let x=0;x<mineSize;x++){
+
+row.push(randomMineral())
+
+}
+
+mineMap.push(row)
+
+}
+
+renderMine()
+
+}
+
+function renderMine(){
+
+let grid=document.getElementById("mineGrid")
+
+grid.innerHTML=""
+
+for(let y=0;y<mineSize;y++){
+
+for(let x=0;x<mineSize;x++){
+
+let block=document.createElement("div")
+
+block.className="mineBlock"
+
+block.innerHTML="⬜"
+
+block.onclick=function(){
+
+mine(x,y)
+
+}
+
+grid.appendChild(block)
+
+}
+
+}
+
+}
+
+function mine(x,y){
+
+let mineral = mineMap[y][x]
+
+if(!mineral){
+alert("⏳ กำลังเกิดใหม่...")
+return
+}
+
+alert("คุณขุดเจอ "+mineral)
+
+let name = mineral.replace(/[^a-zA-Z]/g,"").trim()
+
+if(!inventory[name]) inventory[name]=0
+inventory[name]++
+
+mineMap[y][x] = null
+
+renderInventory()
+
+setTimeout(()=>{
+mineMap[y][x] = randomMineral()
+renderMine()
+},5000)
+
+}
+
+function renderInventory(){
+
+let inv = document.getElementById("inventory")
+
+inv.innerHTML=""
+
+for(let item in inventory){
+
+let slot = document.createElement("div")
+
+slot.className="invSlot"
+
+slot.innerHTML = item + "<br>"+inventory[item]
+
+inv.appendChild(slot)
+
+}
+
+}
+
+function renderLabInventory(){
+
+let box = document.getElementById("labInventory")
+
+if(!box) return
+
+let html=""
+
+for(let item in inventory){
+
+html += item + " x" + inventory[item] + "<br>"
+
+}
+
+box.innerHTML = html || "ไม่มีของ"
+
+}
+
+function startMining(){
+
+showScreen("miningGame")
+
+generateMine()
+
+renderInventory()
+
+}
+
+function goToMining(){
+
+showScreen("miningGame")
+
+renderInventory()
+
+}
+
+function renderInventory(){
+
+let inv = document.getElementById("inventory")
+
+inv.innerHTML=""
+
+for(let item in inventory){
+
+let slot = document.createElement("div")
+
+slot.className="invSlot"
+
+slot.innerHTML = item + "<br>x" + inventory[item]
+
+inv.appendChild(slot)
+
+}
+
+renderLabInventory()
+
+}
+
+/* ===================== */
+/* LAB SYSTEM */
+/* ===================== */
+
+const reactions = {
+
+"H2O":{
+
+anode:"O₂ Gas",
+cathode:"H₂ Gas"
+
+},
+
+"NaCl":{
+
+anode:"Cl₂ Gas",
+cathode:"Na Metal"
+
+},
+
+"CuSO4":{
+
+anode:"O₂ Gas",
+cathode:"Cu Metal"
+
+}
+
+}
+
+function openLab(){
+
+showScreen("labScreen")
+
+renderCraft()
+
+renderLabInventory()
+
+}
+
+function backToMine(){
+
+showScreen("miningGame")
+
+}
+
+function runElectrolysis(){
+
+let chem=document.getElementById("chemSelect").value
+
+let reaction=reactions[chem]
+
+document.getElementById("labResult").innerHTML=
+
+"Anode ➜ "+reaction.anode+"<br>Cathode ➜ "+reaction.cathode
+
+spawnBubble()
+
+}
+
+function spawnBubble(){
+
+let area=document.getElementById("bubbleArea")
+
+for(let i=0;i<10;i++){
+
+let bubble=document.createElement("div")
+
+bubble.className="bubble"
+
+bubble.style.left=Math.random()*200+"px"
+
+bubble.style.animationDelay=(Math.random()*2)+"s"
+
+area.appendChild(bubble)
+
+setTimeout(()=>bubble.remove(),2000)
+
+}
+
+}
+
 function startMatching(){
   showScreen("matchingGame");
   initMatchingGame();
@@ -1509,35 +2114,52 @@ function startGuessing(){
 }
 
 function startMining(){
-  alert("เข้าเกมขุดหาแร่");
+
+showScreen("miningGame")
+
+generateMine()
+
+renderInventory()
+
+}
+
+function startQuiz(){
+  showScreen("game"); 
+  startGame();
 }
 
 let firstCard=null;
 let lockBoard=false;
+let matchCount = 0;
 
 function initMatchingGame(){
 
-  const pairs=[
-    "H₂O","H₂O",
-    "NaCl","NaCl",
-    "CO₂","CO₂"
+  const chemicals=[
+    "H₂O","NaCl","CO₂","O₂","H₂","NH₃","CH₄","HCl","NaOH","KCl",
+    "CaCO₃","MgO","SO₂","NO₂","C₂H₆","C₂H₄","H₂SO₄","HNO₃","Na₂CO₃","KOH"
   ];
 
+  const pairs=[...chemicals,...chemicals]; // ทำให้เป็น 20 คู่
+
   const shuffled=pairs.sort(()=>0.5-Math.random());
+
   const grid=document.getElementById("matchGrid");
   grid.innerHTML="";
 
   shuffled.forEach(text=>{
+
     const card=document.createElement("div");
     card.classList.add("card");
+
     card.dataset.value=text;
     card.innerText="?";
 
     card.onclick=()=>flipCard(card);
 
     grid.appendChild(card);
-  });
 
+  });
+  matchCount = 0;
   firstCard=null;
   lockBoard=false;
 }
@@ -1558,22 +2180,42 @@ function flipCard(card){
 
     firstCard.classList.add("matched");
     card.classList.add("matched");
-    firstCard=null;
 
+    correctSound.currentTime = 0;
+    correctSound.play();
+
+    matchCount++;
+
+    if(matchCount===20){
+        setTimeout(()=>{
+            alert("🎉 คุณจับคู่สารเคมีครบแล้ว!");
+            goToModeSelect();
+        },500);
+    }
+
+    firstCard=null;
+    
   }else{
 
-    lockBoard=true;
+    wrongSound.currentTime = 0;
+    wrongSound.play();
+
+    lockBoard = true;
 
     setTimeout(()=>{
-      firstCard.classList.remove("flipped");
-      card.classList.remove("flipped");
-      firstCard.innerText="?";
-      card.innerText="?";
-      firstCard=null;
-      lockBoard=false;
+
+        card.classList.remove("flipped");
+        firstCard.classList.remove("flipped");
+
+        card.innerText="?";
+        firstCard.innerText="?";
+
+        firstCard=null;
+        lockBoard=false;
+
     },800);
 
-  }
+}
 
 }
 
